@@ -7,27 +7,6 @@
 
 ---
 
-## 📌 Problem Statement – *Rethinking Trade Lifecycle Management*
-
-Legacy post-trade systems are siloed, rigid, and lack real-time visibility. This leads to:
-
-- ❌ Delayed and fragmented exception tracking  
-- ❌ Static, non-personalized trade reports  
-- ❌ Manually operated agent logic without orchestration  
-- ❌ No interactive or intuitive analyst interface  
-
----
-
-## 🎯 Objective
-
-Build a **modular**, **cloud-native**, and **agentic AI-powered** orchestration system to:
-- 📊 Provide **real-time exception tracking**
-- 💬 Enable **chat-based insights** for operations analysts
-- ⚙️ Automate post-trade functions with **goal-driven agents**
-- ☁️ Use **event-driven AWS services** for seamless scalability
-
----
-
 ## 🧠 Team & Approach
 
 **Team Name**: AutoKaarargal  
@@ -46,6 +25,28 @@ Build a **modular**, **cloud-native**, and **agentic AI-powered** orchestration 
 - **Joe Anidas E**  
 - **Suruthi S**  
 - **Namitta Evangelin**
+
+---
+
+
+## 📌 Problem Statement – *Rethinking Trade Lifecycle Management*
+
+Legacy post-trade systems are siloed, rigid, and lack real-time visibility. This leads to:
+
+- ❌ Delayed and fragmented exception tracking  
+- ❌ Static, non-personalized trade reports  
+- ❌ Manually operated agent logic without orchestration  
+- ❌ No interactive or intuitive analyst interface  
+
+---
+
+## 🎯 Objective
+
+Build a **modular**, **cloud-native**, and **agentic AI-powered** orchestration system to:
+- 📊 Provide **real-time exception tracking**
+- 💬 Enable **chat-based insights** for operations analysts
+- ⚙️ Automate post-trade functions with **goal-driven agents**
+- ☁️ Use **event-driven AWS services** for seamless scalability
 
 ---
 
