@@ -1,7 +1,8 @@
+//app/components/ChatInterface.tsx
 'use client';
 import { useChat } from '@ai-sdk/react';
 import ReactMarkdown from 'react-markdown';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function ChatInterface({
   email,
@@ -18,14 +19,20 @@ export default function ChatInterface({
     messages,
     setMessages,
     input,
+    setInput, // <-- Needed for suggestion click
     handleInputChange,
     handleSubmit,
   } = useChat({
     api: '/api/chat',
-    // No onFinish logic needed since /api/chats is not used
   });
 
-  // Load previous session's messages if provided
+  // Suggestions to display above input
+  const suggestions = [
+    'Show the detail of tid000012',
+    'Generate report for the date 1X-12-25',
+  ];
+  const [showSuggestions, setShowSuggestions] = useState(true);
+
   useEffect(() => {
     if (initialMessages && initialMessages.length > 0) {
       setMessages(initialMessages);
@@ -35,9 +42,13 @@ export default function ChatInterface({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialMessages]);
 
+  const handleSuggestionClick = (suggestion: string) => {
+    setInput(suggestion);
+    setShowSuggestions(false);
+  };
+
   return (
     <div className="w-full h-full flex flex-col bg-white">
-      {/* No heading here */}
       <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
         {messages.map((m, idx) => (
           <div
@@ -59,6 +70,23 @@ export default function ChatInterface({
           </div>
         ))}
       </div>
+
+      {/* Suggestions above the input */}
+      {showSuggestions && (
+        <div className="flex gap-2 px-4 pb-2">
+          {suggestions.map((s, i) => (
+            <button
+              key={i}
+              className="bg-gray-200 hover:bg-blue-100 text-gray-800 px-3 py-2 rounded-lg text-sm transition-colors"
+              onClick={() => handleSuggestionClick(s)}
+              type="button"
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="flex gap-2 p-4 border-t bg-gray-50">
         <input
           className="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
