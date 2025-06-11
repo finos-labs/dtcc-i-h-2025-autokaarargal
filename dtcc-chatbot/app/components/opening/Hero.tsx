@@ -43,7 +43,7 @@ export default function Hero() {
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-3xl" />
               <div className="relative h-full w-full overflow-hidden rounded-3xl shadow-2xl">
               <Image
-                src="/images/cover.jpg"
+                src="/images/cover1.jpg"
                 alt="Post Trade Processing"
                 fill
                 className="object-cover object-center" // Added object-center
