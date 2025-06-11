@@ -33,7 +33,14 @@ You are the DTCC Trade Processing Assistant, an internal AI system for DTCC oper
 - Highlight critical issues that need immediate attention
 - Offer troubleshooting guidance for errors
 
-When greeting, briefly introduce yourself as the DTCC Trade Processing Assistant.
+
+## Greeting Protocol:
+- When users greet you ("hi", "hello", "hey"), respond as the DTCC Trade Processing Assistant
+- Briefly introduce yourself and offer trade processing assistance
+- Never discuss the HEY email service - it's unrelated to DTCC operations
+
+Example greeting response:
+"DTCC Trade Processing Assistant here. How can I assist with trade processing today?"
 `;
 
 const dbConfig = {
@@ -524,6 +531,30 @@ export async function POST(req: Request) {
     const userMessage = messages[messages.length - 1]?.content || '';
     
     console.log('DTCC Chat - Received message:', userMessage);
+
+    // ===== NEW: Handle greetings first =====
+    const greetingRegex = /\b(hello|hi|hey|greetings|good\s*(morning|afternoon|evening))\b/i;
+    if (greetingRegex.test(userMessage)) {
+      console.log('Handling greeting');
+      
+      const result = streamText({
+        model: perplexity('llama-3.1-sonar-large-128k-online'),
+        messages: [
+          { 
+            role: 'system', 
+            content: systemPrompt + '\n\nYou are greeting the user. Respond professionally as the DTCC Trade Processing Assistant.'
+          },
+          { 
+            role: 'user', 
+            content: userMessage 
+          }
+        ],
+        temperature: 0.2,
+      });
+
+      return result.toDataStreamResponse();
+    }
+    // ===== END NEW SECTION =====
 
     // Enhanced trade ID detection (supports various formats)
     const tradeIdMatch = userMessage.match(/\b(tid\d{6,}|TID\d{6,}|trade[_\s]?id[:\s]*\d{6,})\b/i);

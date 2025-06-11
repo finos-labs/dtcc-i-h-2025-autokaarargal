@@ -2,17 +2,63 @@
 'use client';
 import { useChat } from '@ai-sdk/react';
 import ReactMarkdown from 'react-markdown';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
 // Helper: Detects if the last assistant message is a report (weekly, daily, monthly)
 function isReportMessage(message: { role: string; content: string }) {
   if (message.role !== 'assistant') return false;
-  // Adjust these keywords if your report format changes
   return (
     /Trade Processing Report/i.test(message.content) ||
     /Executive Summary/i.test(message.content) ||
     /Status Distribution/i.test(message.content)
   );
+}
+
+// Generate context-aware suggestions based on conversation history
+function getContextSuggestions(messages: any[]) {
+  const lastMessage = messages[messages.length - 1]?.content || '';
+  const hasTradeId = /\btid\d{6,}\b/i.test(lastMessage);
+  const hasReport = /report/i.test(lastMessage);
+  const hasError = /ERR[123]/i.test(lastMessage);
+
+  // Base suggestions
+  let suggestions = [
+    'Show the detail of tid000012',
+    'Generate weekly report',
+    'Generate monthly report',
+    'What does ERR2 mean?',
+  ];
+
+  // Context-aware adjustments
+  if (hasTradeId) {
+    suggestions = [
+      'Show processing timeline',
+      'Explain current status',
+      'What are next steps?',
+      'Find similar trades',
+      ...suggestions.filter(s => !s.includes('tid'))
+    ];
+  }
+
+  if (hasReport) {
+    suggestions = [
+      'Download CSV',
+      'Show error details',
+      'Compare to last week',
+      ...suggestions.filter(s => !s.includes('report'))
+    ];
+  }
+
+  if (hasError) {
+    suggestions = [
+      'How to resolve this error?',
+      'Who should I contact?',
+      'Show documentation',
+      ...suggestions.filter(s => !s.includes('ERR'))
+    ];
+  }
+
+  return suggestions.slice(0, 4); // Return top 4 suggestions
 }
 
 export default function ChatInterface({
@@ -33,18 +79,16 @@ export default function ChatInterface({
     setInput,
     handleInputChange,
     handleSubmit,
+    isLoading
   } = useChat({
     api: '/api/chat',
   });
 
-  // Suggestions to display above input
-  const suggestions = [
-    'Show the detail of tid000012',
-    'Generate report for the date 1X-12-25',
-    'Generate weekly report',
-    'Generate monthly report'
-  ];
-  const [showSuggestions, setShowSuggestions] = useState(true);
+  // Generate dynamic suggestions based on conversation context
+  const suggestions = useMemo(() => getContextSuggestions(messages), [messages]);
+
+  // Show suggestions when input is empty and not loading
+  const showSuggestions = input === '' && !isLoading;
 
   useEffect(() => {
     if (initialMessages && initialMessages.length > 0) {
@@ -52,12 +96,17 @@ export default function ChatInterface({
     } else {
       setMessages([]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialMessages]);
+  }, [initialMessages, setMessages]);
 
   const handleSuggestionClick = (suggestion: string) => {
     setInput(suggestion);
-    setShowSuggestions(false);
+    // Auto-submit if suggestion is a command
+    if (suggestion.startsWith('Generate') || suggestion.startsWith('Show')) {
+      setTimeout(() => {
+        const form = document.querySelector('form');
+        if (form) form.requestSubmit();
+      }, 100);
+    }
   };
 
   // Find the last assistant message (for report detection)
@@ -88,9 +137,21 @@ export default function ChatInterface({
             )}
           </div>
         ))}
+        
+        {isLoading && (
+          <div className="mb-4 p-3 rounded-lg bg-gray-100 max-w-[90%]">
+            <div className="text-sm font-medium text-gray-600 mb-1">DTCC Assistant</div>
+            <div className="flex items-center text-gray-600">
+              <div className="animate-pulse">Processing trade data...</div>
+              <div className="ml-2 h-2 w-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+              <div className="ml-1 h-2 w-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+              <div className="ml-1 h-2 w-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* CSV Download Links: Only show when a report is generated */}
+      {/* CSV Download Links */}
       {lastAssistantMessage && isReportMessage(lastAssistantMessage) && (
         <div className="flex flex-wrap gap-3 px-4 pb-4">
           <a
@@ -117,14 +178,13 @@ export default function ChatInterface({
         </div>
       )}
 
-
-      {/* Suggestions above the input */}
-      {showSuggestions && (
-        <div className="flex gap-2 px-4 pb-2">
+      {/* Dynamic suggestions */}
+      {showSuggestions && suggestions.length > 0 && (
+        <div className="flex flex-wrap gap-2 px-4 pb-2">
           {suggestions.map((s, i) => (
             <button
               key={i}
-              className="bg-gray-200 hover:bg-blue-100 text-gray-800 px-3 py-2 rounded-lg text-sm transition-colors"
+              className="bg-gray-200 hover:bg-blue-100 text-gray-800 px-3 py-2 rounded-lg text-sm transition-colors whitespace-nowrap"
               onClick={() => handleSuggestionClick(s)}
               type="button"
             >
@@ -142,10 +202,11 @@ export default function ChatInterface({
           onChange={handleInputChange}
         />
         <button
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
           type="submit"
+          disabled={isLoading}
         >
-          Send
+          {isLoading ? 'Processing...' : 'Send'}
         </button>
       </form>
     </div>
