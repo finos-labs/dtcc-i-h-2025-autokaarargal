@@ -15,16 +15,17 @@
 **Category**: Academic  
 
 ### 👥 Team Members (Full Names)
+
+- **Jayasurya R**  
+- **Joe Anidas E** 
+- **Peggy Priscilla Marie J**  
+- **Pugazhvendhan S**  
+- **Suruthi S**  
+- **Namitta Evangelin**
 - **Jeff Reuben S I**  
 - **Anton Gilchrist A**  
 - **Sumithra S**  
 - **Jabin Joseph M**  
-- **Jayasurya R**  
-- **Pugazhvendhan S**  
-- **Peggy Priscilla Marie J**  
-- **Joe Anidas E**  
-- **Suruthi S**  
-- **Namitta Evangelin**
 
 ---
 
