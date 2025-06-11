@@ -2,27 +2,29 @@
 'use client';
 import { useChat } from '@ai-sdk/react';
 import ReactMarkdown from 'react-markdown';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 
-// Helper: Detects if the last assistant message is a report (weekly, daily, monthly)
-function isReportMessage(message: { role: string; content: string }) {
-  if (message.role !== 'assistant') return false;
-  return (
-    /Trade Processing Report/i.test(message.content) ||
-    /Executive Summary/i.test(message.content) ||
-    /Status Distribution/i.test(message.content)
-  );
+// Helper: Detects report type from assistant message
+function getReportType(message: { role: string; content: string }) {
+  if (message.role !== 'assistant') return null;
+  
+  if (/Daily Trade Processing Report/i.test(message.content)) return 'daily';
+  if (/Weekly Trade Processing Report/i.test(message.content)) return 'weekly';
+  if (/Monthly Trade Processing Report/i.test(message.content)) return 'monthly';
+  
+  return null;
 }
 
-// Generate context-aware suggestions
-function getContextSuggestions() {
-  // Only show the requested suggestions
-  return [
-    'Show details for tid000012',
-    'Generate weekly report',
-    'Generate daily report',
-    'Generate monthly report'
-  ];
+// Custom button component to prevent hydration errors
+function CustomButton({ 
+  children, 
+  ...props 
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button {...props} data-fdprocessedid="false">
+      {children}
+    </button>
+  );
 }
 
 export default function ChatInterface({
@@ -48,8 +50,13 @@ export default function ChatInterface({
     api: '/api/chat',
   });
 
-  // Use the simplified suggestions list
-  const suggestions = useMemo(getContextSuggestions, []);
+  // Static suggestions list
+  const suggestions = [
+    'Show details for tid000012',
+    'Generate weekly report',
+    'Generate daily report',
+    'Generate monthly report'
+  ];
 
   // Show suggestions when input is empty and not loading
   const showSuggestions = input === '' && !isLoading;
@@ -62,16 +69,30 @@ export default function ChatInterface({
     }
   }, [initialMessages, setMessages]);
 
+  // Only sets the input, doesn't submit
   const handleSuggestionClick = (suggestion: string) => {
-    // Only set the input, don't submit
     setInput(suggestion);
+    // Focus the input field for immediate editing
+    setTimeout(() => {
+      const inputElement = document.querySelector('input[type="text"]');
+      if (inputElement instanceof HTMLInputElement) {
+        inputElement.focus();
+      }
+    }, 10);
   };
 
-  // Find the last assistant message (for report detection)
-  const lastAssistantMessage =
-    messages.length > 0
-      ? [...messages].reverse().find((m) => m.role === 'assistant')
-      : null;
+  // Get report type from last assistant message
+  const lastAssistantMessage = messages.length > 0
+    ? [...messages].reverse().find((m) => m.role === 'assistant')
+    : null;
+
+  const reportType = lastAssistantMessage 
+    ? getReportType(lastAssistantMessage)
+    : null;
+
+  // Check if it's a generic report request
+  const isGenericReport = lastAssistantMessage?.content.includes('Trade Processing Report') && 
+                          !reportType;
 
   return (
     <div className="w-full h-full flex flex-col bg-white">
@@ -109,45 +130,53 @@ export default function ChatInterface({
         )}
       </div>
 
-      {/* CSV Download Links */}
-      {lastAssistantMessage && isReportMessage(lastAssistantMessage) && (
+      {/* Context-aware CSV Download Links */}
+      {(reportType || isGenericReport) && (
         <div className="flex flex-wrap gap-3 px-4 pb-4">
-          <a
-            href="/api/trade-report/daily"
-            download="daily_trade_report.csv"
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
-          >
-            Download Daily Report CSV 
-          </a>
-          <a
-            href="/api/trade-report/weekly"
-            download="weekly_trade_report.csv"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
-          >
-            Download Weekly Report CSV
-          </a>
-          <a
-            href="/api/trade-report/monthly"
-            download="monthly_trade_report.csv"
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm"
-          >
-            Download Monthly Report CSV
-          </a>
+          {(reportType === 'daily' || isGenericReport) && (
+            <a
+              href="/api/trade-report/daily"
+              download="daily_trade_report.csv"
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
+            >
+              Download Daily Report CSV 
+            </a>
+          )}
+          
+          {(reportType === 'weekly' || isGenericReport) && (
+            <a
+              href="/api/trade-report/weekly"
+              download="weekly_trade_report.csv"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
+            >
+              Download Weekly Report CSV
+            </a>
+          )}
+          
+          {(reportType === 'monthly' || isGenericReport) && (
+            <a
+              href="/api/trade-report/monthly"
+              download="monthly_trade_report.csv"
+              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm"
+            >
+              Download Monthly Report CSV
+            </a>
+          )}
         </div>
       )}
 
-      {/* Dynamic suggestions */}
-      {showSuggestions && suggestions.length > 0 && (
+      {/* Static suggestions */}
+      {showSuggestions && (
         <div className="flex flex-wrap gap-2 px-4 pb-2">
           {suggestions.map((s, i) => (
-            <button
+            <CustomButton
               key={i}
               className="bg-gray-200 hover:bg-blue-100 text-gray-800 px-3 py-2 rounded-lg text-sm transition-colors whitespace-nowrap"
               onClick={() => handleSuggestionClick(s)}
               type="button"
             >
               {s}
-            </button>
+            </CustomButton>
           ))}
         </div>
       )}
@@ -158,14 +187,15 @@ export default function ChatInterface({
           value={input}
           placeholder="Ask about a trade issue or request a report…"
           onChange={handleInputChange}
+          type="text"
         />
-        <button
+        <CustomButton
           className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
           type="submit"
-          disabled={isLoading || input.trim() === ''}
+          disabled={isLoading}
         >
           {isLoading ? 'Processing...' : 'Send'}
-        </button>
+        </CustomButton>
       </form>
     </div>
   );

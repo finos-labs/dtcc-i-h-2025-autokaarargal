@@ -19,7 +19,6 @@ interface AuthFormProps {
   initialEmail?: string;
 }
 
-// Allowed domains for signup/login
 const allowedDomains = ['@dtcc.com', '@licet.ac.in'];
 function isEmailAllowed(email: string) {
   return allowedDomains.some(domain => email.toLowerCase().endsWith(domain));
@@ -151,94 +150,115 @@ export default function AuthForm({
   };
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-gray-100">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-2xl p-8 flex flex-col gap-6">
-        <div className="mb-2">
-          <h1 className="text-2xl font-bold text-blue-900 mb-1">
-            {isLogin ? 'Login to DTCC Portal' : 'Sign Up for DTCC Portal'}
-          </h1>
-          <p className="text-gray-600 text-sm">
-            {isLogin
-              ? 'Enter your credentials to access the DTCC Post-Trade Processing Platform.'
-              : 'Create your internal account to access DTCC post-trade tools.'}
-          </p>
-        </div>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <input
-            type="email"
-            placeholder="Email"
-            className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoComplete="email"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete={isLogin ? 'current-password' : 'new-password'}
-          />
-          <button
-            type="submit"
-            className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-          >
-            {isLogin ? 'Login' : 'Create Account'}
-          </button>
-          {error && (
-            <div className="text-red-600 text-sm bg-red-50 border border-red-200 rounded p-2 text-center">
-              {error}
+    <div className="w-full min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-gray-100">
+      <div className="flex-grow flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 flex flex-col gap-6">
+          <div className="text-center mb-2">
+            <h1 className="text-2xl font-bold text-blue-900 mb-1">
+              {isLogin ? 'Login to DTCC Portal' : 'Sign Up for DTCC Portal'}
+            </h1>
+            <p className="text-gray-600 text-sm">
+              {isLogin
+                ? 'Enter your credentials to access the DTCC Post-Trade Processing Platform.'
+                : 'Create your internal account to access DTCC post-trade tools.'}
+            </p>
+          </div>
+          
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1">
+              <label htmlFor="email" className="text-sm font-medium text-gray-700">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                placeholder="your@email.com"
+                className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+              />
             </div>
-          )}
-        </form>
-        <div className="flex items-center gap-2 my-2">
-          <div className="flex-1 h-px bg-gray-200" />
-          <span className="text-gray-400 text-xs">OR</span>
-          <div className="flex-1 h-px bg-gray-200" />
-        </div>
-        <button
-          className="w-full py-3 flex items-center justify-center gap-2 bg-white border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
-          onClick={handleGoogleSignIn}
-          type="button"
-        >
-          <svg className="w-5 h-5" viewBox="0 0 48 48">
-            <g>
-              <path fill="#4285F4" d="M24 9.5c3.54 0 6.7 1.22 9.19 3.6l6.85-6.85C36.53 2.89 30.76 0 24 0 14.82 0 6.82 5.85 2.67 14.29l7.96 6.19C12.19 13.89 17.58 9.5 24 9.5z"/>
-              <path fill="#34A853" d="M46.1 24.5c0-1.61-.14-3.15-.39-4.63H24v9.19h12.43c-.54 2.93-2.18 5.4-4.66 7.06l7.2 5.59C43.98 37.06 46.1 31.31 46.1 24.5z"/>
-              <path fill="#FBBC05" d="M10.63 28.48a14.47 14.47 0 0 1 0-8.95l-7.96-6.19A24.01 24.01 0 0 0 0 24c0 3.77.9 7.35 2.67 10.71l7.96-6.23z"/>
-              <path fill="#EA4335" d="M24 48c6.76 0 12.53-2.23 16.7-6.06l-7.2-5.59c-2.01 1.36-4.58 2.17-7.5 2.17-6.42 0-11.81-4.39-13.37-10.29l-7.96 6.23C6.82 42.15 14.82 48 24 48z"/>
-              <path fill="none" d="M0 0h48v48H0z"/>
-            </g>
-          </svg>
-          Continue with Google
-        </button>
-        <div className="text-center text-gray-600 mt-2">
-          {isLogin ? (
-            <span>
-              Don&apos;t have an account?{' '}
-              <button
-                type="button"
-                className="text-blue-600 underline hover:text-blue-800"
-                onClick={() => router.push('/signup')}
-              >
-                Sign Up
-              </button>
-            </span>
-          ) : (
-            <span>
-              Already have an account?{' '}
-              <button
-                type="button"
-                className="text-blue-600 underline hover:text-blue-800"
-                onClick={() => router.push('/login')}
-              >
-                Login
-              </button>
-            </span>
-          )}
+            
+            <div className="flex flex-col gap-1">
+              <label htmlFor="password" className="text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete={isLogin ? 'current-password' : 'new-password'}
+              />
+            </div>
+            
+            <button
+              type="submit"
+              className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md"
+            >
+              {isLogin ? 'Login' : 'Create Account'}
+            </button>
+            
+            {error && (
+              <div className="text-red-600 text-sm bg-red-50 border border-red-200 rounded p-2 text-center">
+                {error}
+              </div>
+            )}
+          </form>
+          
+          <div className="flex items-center gap-2 my-2">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-gray-400 text-xs">OR</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
+          
+          <button
+            className="w-full py-3 flex items-center justify-center gap-2 bg-white border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
+            onClick={handleGoogleSignIn}
+            type="button"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 48 48">
+              <g>
+                <path fill="#4285F4" d="M24 9.5c3.54 0 6.7 1.22 9.19 3.6l6.85-6.85C36.53 2.89 30.76 0 24 0 14.82 0 6.82 5.85 2.67 14.29l7.96 6.19C12.19 13.89 17.58 9.5 24 9.5z"/>
+                <path fill="#34A853" d="M46.1 24.5c0-1.61-.14-3.15-.39-4.63H24v9.19h12.43c-.54 2.93-2.18 5.4-4.66 7.06l7.2 5.59C43.98 37.06 46.1 31.31 46.1 24.5z"/>
+                <path fill="#FBBC05" d="M10.63 28.48a14.47 14.47 0 0 1 0-8.95l-7.96-6.19A24.01 24.01 0 0 0 0 24c0 3.77.9 7.35 2.67 10.71l7.96-6.23z"/>
+                <path fill="#EA4335" d="M24 48c6.76 0 12.53-2.23 16.7-6.06l-7.2-5.59c-2.01 1.36-4.58 2.17-7.5 2.17-6.42 0-11.81-4.39-13.37-10.29l-7.96 6.23C6.82 42.15 14.82 48 24 48z"/>
+                <path fill="none" d="M0 0h48v48H0z"/>
+              </g>
+            </svg>
+            Continue with Google
+          </button>
+          
+          <div className="text-center text-gray-600 mt-2 text-sm">
+            {isLogin ? (
+              <span>
+                Don&apos;t have an account?{' '}
+                <button
+                  type="button"
+                  className="text-blue-600 font-medium hover:text-blue-800"
+                  onClick={() => router.push('/signup')}
+                >
+                  Sign Up
+                </button>
+              </span>
+            ) : (
+              <span>
+                Already have an account?{' '}
+                <button
+                  type="button"
+                  className="text-blue-600 font-medium hover:text-blue-800"
+                  onClick={() => router.push('/login')}
+                >
+                  Login
+                </button>
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>
