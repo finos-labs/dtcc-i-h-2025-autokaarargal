@@ -1,8 +1,19 @@
-//app/components/ChatInterface.tsx
+// app/components/ChatInterface.tsx
 'use client';
 import { useChat } from '@ai-sdk/react';
 import ReactMarkdown from 'react-markdown';
 import { useEffect, useState } from 'react';
+
+// Helper: Detects if the last assistant message is a report (weekly, daily, monthly)
+function isReportMessage(message: { role: string; content: string }) {
+  if (message.role !== 'assistant') return false;
+  // Adjust these keywords if your report format changes
+  return (
+    /Trade Processing Report/i.test(message.content) ||
+    /Executive Summary/i.test(message.content) ||
+    /Status Distribution/i.test(message.content)
+  );
+}
 
 export default function ChatInterface({
   email,
@@ -19,7 +30,7 @@ export default function ChatInterface({
     messages,
     setMessages,
     input,
-    setInput, // <-- Needed for suggestion click
+    setInput,
     handleInputChange,
     handleSubmit,
   } = useChat({
@@ -30,6 +41,8 @@ export default function ChatInterface({
   const suggestions = [
     'Show the detail of tid000012',
     'Generate report for the date 1X-12-25',
+    'Generate weekly report',
+    'Generate monthly report'
   ];
   const [showSuggestions, setShowSuggestions] = useState(true);
 
@@ -46,6 +59,12 @@ export default function ChatInterface({
     setInput(suggestion);
     setShowSuggestions(false);
   };
+
+  // Find the last assistant message (for report detection)
+  const lastAssistantMessage =
+    messages.length > 0
+      ? [...messages].reverse().find((m) => m.role === 'assistant')
+      : null;
 
   return (
     <div className="w-full h-full flex flex-col bg-white">
@@ -70,6 +89,34 @@ export default function ChatInterface({
           </div>
         ))}
       </div>
+
+      {/* CSV Download Links: Only show when a report is generated */}
+      {lastAssistantMessage && isReportMessage(lastAssistantMessage) && (
+        <div className="flex flex-wrap gap-3 px-4 pb-4">
+          <a
+            href="/api/trade-report/daily"
+            download="daily_trade_report.csv"
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
+          >
+            Download Daily Report CSV 
+          </a>
+          <a
+            href="/api/trade-report/weekly"
+            download="weekly_trade_report.csv"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
+          >
+            Download Weekly Report CSV
+          </a>
+          <a
+            href="/api/trade-report/monthly"
+            download="monthly_trade_report.csv"
+            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm"
+          >
+            Download Monthly Report CSV
+          </a>
+        </div>
+      )}
+
 
       {/* Suggestions above the input */}
       {showSuggestions && (

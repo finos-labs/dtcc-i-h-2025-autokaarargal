@@ -2,7 +2,7 @@ import { perplexity } from '@ai-sdk/perplexity';
 import { streamText } from 'ai';
 import mysql from 'mysql2/promise';
 
-export const maxDuration = 30; // seconds
+export const maxDuration =50; // seconds
 
 const systemPrompt = `
 You are the DTCC Trade Processing Assistant, an internal AI system for DTCC operations staff. You help analyze trade processing status, troubleshoot issues, and provide insights into the trade lifecycle.
