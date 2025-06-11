@@ -7,13 +7,12 @@ import ChatInterface from '@/app/components/ChatInterface';
 
 export default function DashboardPage() {
   const [userData, setUserData] = useState<any>(null);
-  const [loading, setLoading] = useState(true); // Track loading state
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (!user) {
-        // Not authenticated, redirect to home
         router.replace('/');
         setLoading(false);
       } else {
@@ -30,31 +29,35 @@ export default function DashboardPage() {
   }, [router]);
 
   if (loading) {
-    // Optionally render a loading spinner or nothing
     return null;
   }
 
-  // If not authenticated, you can optionally double-check and redirect
   if (!userData) {
-    // This is a fallback; normally, the redirect above will handle it
     router.replace('/');
     return null;
   }
 
   return (
-    <div className="min-h-screen h-screen w-full flex flex-col bg-gradient-to-br from-blue-50 via-white to-gray-100">
-      <header className="w-full flex justify-between items-center px-8 py-6 bg-white/90 shadow">
+    <div className="relative min-h-screen h-screen w-full flex flex-col bg-slate-900">
+      {/* Grid pattern background */}
+      <div className="absolute inset-0 opacity-10 [background-image:linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] [background-size:24px_24px]"></div>
+      
+      <header className="relative z-10 w-full flex justify-between items-center px-8 py-6 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
         <div>
-          <h1 className="text-2xl font-bold text-blue-900">
-            Welcome, {userData?.email}
+          <h1 className="text-2xl font-bold text-white">
+            Welcome, <span className="text-blue-400">{userData?.email}</span>
           </h1>
           <div className="security-section mt-1">
             {userData?.providers?.includes('password') ? (
-              <p className="text-sm text-green-600">
-                Account security: Password set ✔️
+              <p className="text-sm text-green-400 flex items-center">
+                <span className="mr-1">Account security: Password set</span>
+                <span>✔️</span>
               </p>
             ) : (
-              <Link href="/profile" className="text-blue-600 text-sm">
+              <Link 
+                href="/profile" 
+                className="text-blue-400 text-sm hover:text-blue-300 transition-colors"
+              >
                 Set up password for email login
               </Link>
             )}
@@ -65,13 +68,13 @@ export default function DashboardPage() {
             await auth.signOut();
             router.push('/');
           }}
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+          className="px-4 py-2 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg hover:from-red-700 hover:to-orange-700 transition-colors"
         >
           Logout
         </button>
       </header>
 
-      <main className="flex-1 h-full w-full flex flex-col">
+      <main className="relative z-10 flex-1 h-full w-full flex flex-col">
         <ChatInterface email={userData?.email} />
       </main>
     </div>
