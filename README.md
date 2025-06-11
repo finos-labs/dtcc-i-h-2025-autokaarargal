@@ -69,7 +69,7 @@ Build a **modular**, **cloud-native**, and **agentic AI-powered** orchestration 
 | **Frontend**        | Next.js 14, Tailwind CSS, Chatbot UI                                         |
 | **Backend**         | AWS Lambda, Step Functions, Node.js                                          |
 | **Exception Memory**| Aurora DB (MySQL) with structured exception tables                           |
-| **AI Interface**    | NLP Chatbot for Exception Insight                        |
+| **AI Interface**    | LangChain-powered chatbot (NLP for Exception Insight)                        |
 | **Notifications**   | Email, Slack/Teams Webhook Integration                                       |
 
 ---
