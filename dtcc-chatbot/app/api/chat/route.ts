@@ -51,6 +51,45 @@ const dbConfig = {
   database: process.env.DB_NAME,
 };
 
+function isOffTopic(message: string): boolean {
+  const lowerMessage = message.toLowerCase();
+
+  const greetingRegex = /^(hey|hi|hello|yo|sup|howdy)[\s!,.]?/i;
+
+  const domainKeywords = [
+    'trade', 'dtcc', 'status', 'verf', 'umat', 'mtch', 'rcnd', 'skip', 'unmt',
+    'err1', 'err2', 'err3', 'reconcile', 'match', 'verify', 'process', 'broker',
+    'settlement', 'clearing', 'transaction', 'report', 'error', 'validation',
+    'counterpart', 'operation', 'lifecycle', 'statistics', 'trend', 'resolution'
+  ];
+
+  const offTopicIndicators = [
+    'hey.com', 'email service', 'calendar', 'notes', 'scheduling', 'productivity app',
+    'music', 'movie', 'sport', 'news', 'weather', 'joke', 'funny', 'entertain',
+    'recipe', 'cook', 'shopping', 'game', 'trivia', 'personal', 'off-topic',
+    'unrelated', 'outside scope', 'not about trade', 'other subject'
+  ];
+
+  const hasDomainKeyword = domainKeywords.some(keyword =>
+    lowerMessage.includes(keyword)
+  );
+
+  const hasOffTopicIndicator = offTopicIndicators.some(indicator =>
+    lowerMessage.includes(indicator)
+  );
+
+  const isHeyEmailQuery = (
+    lowerMessage.includes('hey') &&
+    !greetingRegex.test(lowerMessage) &&
+    (lowerMessage.includes('email') || lowerMessage.includes('app'))
+  );
+
+  return (
+    (!hasDomainKeyword && hasOffTopicIndicator) ||
+    isHeyEmailQuery
+  );
+}
+
 async function fetchTradeData(tradeId: string) {
   let connection;
   try {
@@ -555,6 +594,45 @@ export async function POST(req: Request) {
       return result.toDataStreamResponse();
     }
     // ===== END NEW SECTION =====
+
+    // ===== NEW: Off-topic handling =====
+    if (isOffTopic(userMessage)) {
+      console.log('Detected off-topic query');
+
+      const offTopicResponse = `🚫 **Off-Topic Request**  
+        This assistant is designed exclusively for DTCC trade processing operations. 
+
+        Your query appears unrelated to our core functions:
+        - Trade status lookups
+        - Error diagnosis
+        - Processing reports
+        - DTCC reconciliation issues
+
+        Please ask about:
+        ✓ Trade processing status (e.g., "status of TID000553")
+        ✓ Error resolution (e.g., "how to fix ERR2?")
+        ✓ Report generation (e.g., "generate weekly report")
+        ✓ Trade lifecycle explanations`;
+
+              const result = streamText({
+                model: perplexity('llama-3.1-sonar-large-128k-online'),
+                messages: [
+                  { 
+                    role: 'system', 
+                    content: `You are the DTCC Trade Processing Assistant. Respond ONLY with the provided off-topic message without additions or explanations.`
+                  },
+                  { 
+                    role: 'user', 
+                    content: offTopicResponse 
+                  }
+                ],
+                temperature: 0,
+                maxTokens: 150
+              });
+
+              return result.toDataStreamResponse();
+            }
+
 
     // Enhanced trade ID detection (supports various formats)
     const tradeIdMatch = userMessage.match(/\b(tid\d{6,}|TID\d{6,}|trade[_\s]?id[:\s]*\d{6,})\b/i);

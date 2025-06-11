@@ -14,51 +14,15 @@ function isReportMessage(message: { role: string; content: string }) {
   );
 }
 
-// Generate context-aware suggestions based on conversation history
-function getContextSuggestions(messages: any[]) {
-  const lastMessage = messages[messages.length - 1]?.content || '';
-  const hasTradeId = /\btid\d{6,}\b/i.test(lastMessage);
-  const hasReport = /report/i.test(lastMessage);
-  const hasError = /ERR[123]/i.test(lastMessage);
-
-  // Base suggestions
-  let suggestions = [
-    'Show the detail of tid000012',
+// Generate context-aware suggestions
+function getContextSuggestions() {
+  // Only show the requested suggestions
+  return [
+    'Show details for tid000012',
     'Generate weekly report',
-    'Generate monthly report',
-    'What does ERR2 mean?',
+    'Generate daily report',
+    'Generate monthly report'
   ];
-
-  // Context-aware adjustments
-  if (hasTradeId) {
-    suggestions = [
-      'Show processing timeline',
-      'Explain current status',
-      'What are next steps?',
-      'Find similar trades',
-      ...suggestions.filter(s => !s.includes('tid'))
-    ];
-  }
-
-  if (hasReport) {
-    suggestions = [
-      'Download CSV',
-      'Show error details',
-      'Compare to last week',
-      ...suggestions.filter(s => !s.includes('report'))
-    ];
-  }
-
-  if (hasError) {
-    suggestions = [
-      'How to resolve this error?',
-      'Who should I contact?',
-      'Show documentation',
-      ...suggestions.filter(s => !s.includes('ERR'))
-    ];
-  }
-
-  return suggestions.slice(0, 4); // Return top 4 suggestions
 }
 
 export default function ChatInterface({
@@ -84,8 +48,8 @@ export default function ChatInterface({
     api: '/api/chat',
   });
 
-  // Generate dynamic suggestions based on conversation context
-  const suggestions = useMemo(() => getContextSuggestions(messages), [messages]);
+  // Use the simplified suggestions list
+  const suggestions = useMemo(getContextSuggestions, []);
 
   // Show suggestions when input is empty and not loading
   const showSuggestions = input === '' && !isLoading;
@@ -99,14 +63,8 @@ export default function ChatInterface({
   }, [initialMessages, setMessages]);
 
   const handleSuggestionClick = (suggestion: string) => {
+    // Only set the input, don't submit
     setInput(suggestion);
-    // Auto-submit if suggestion is a command
-    if (suggestion.startsWith('Generate') || suggestion.startsWith('Show')) {
-      setTimeout(() => {
-        const form = document.querySelector('form');
-        if (form) form.requestSubmit();
-      }, 100);
-    }
   };
 
   // Find the last assistant message (for report detection)
@@ -204,7 +162,7 @@ export default function ChatInterface({
         <button
           className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || input.trim() === ''}
         >
           {isLoading ? 'Processing...' : 'Send'}
         </button>

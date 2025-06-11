@@ -7,12 +7,15 @@ import ChatInterface from '@/app/components/ChatInterface';
 
 export default function DashboardPage() {
   const [userData, setUserData] = useState<any>(null);
+  const [loading, setLoading] = useState(true); // Track loading state
   const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (!user) {
-        router.push('/login');
+        // Not authenticated, redirect to home
+        router.replace('/');
+        setLoading(false);
       } else {
         try {
           const response = await fetch(`/api/users/${user.uid}`);
@@ -20,10 +23,23 @@ export default function DashboardPage() {
         } catch (error) {
           console.error('Failed to fetch user data:', error);
         }
+        setLoading(false);
       }
     });
     return () => unsubscribe();
   }, [router]);
+
+  if (loading) {
+    // Optionally render a loading spinner or nothing
+    return null;
+  }
+
+  // If not authenticated, you can optionally double-check and redirect
+  if (!userData) {
+    // This is a fallback; normally, the redirect above will handle it
+    router.replace('/');
+    return null;
+  }
 
   return (
     <div className="min-h-screen h-screen w-full flex flex-col bg-gradient-to-br from-blue-50 via-white to-gray-100">
