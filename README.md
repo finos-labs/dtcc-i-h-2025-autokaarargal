@@ -1,58 +1,119 @@
 ![badge-labs](https://user-images.githubusercontent.com/327285/230928932-7c75f8ed-e57b-41db-9fb7-a292a13a1e58.svg)
 
-# DTCC AI Hackathon 2025: Empowering India's Innovators
-The purpose of hackathon is to leverage AI and ML Technologies to address critical challenges in the financial markets. The overall goal is to progress industry through Innovation, Networking and by providing effective Solutions.
+# 🚀 Post-Trade Orchestration Engine  
+**Agentic, Exception-Aware Trade Processing with Chatbot Insight**  
+**DTCC AI Hackathon 2025 – Room 3 | Academic Category**  
+**Team: AutoKaarargal**
 
-**Hackathon Key Dates** 
-•	June 6th - Event invites will be sent to participants
-•	June 9th - Hackathon Open
-•	June 9th-11th - Team collaboration and Use Case development
-•	June 12th - Team presentations & demos
-•	June 16th - Winners Announcement
+---
 
-More Info - https://communications.dtcc.com/dtcc-ai-hackathon-registration-17810.html
+## 📌 Problem Statement – *Rethinking Trade Lifecycle Management*
 
-Commit Early & Commit Often!!!
+Legacy post-trade systems are siloed, rigid, and lack real-time visibility. This leads to:
 
-## Project Name
+- ❌ Delayed and fragmented exception tracking  
+- ❌ Static, non-personalized trade reports  
+- ❌ Manually operated agent logic without orchestration  
+- ❌ No interactive or intuitive analyst interface  
 
+---
 
-### Project Details
+## 🎯 Objective
 
+Build a **modular**, **cloud-native**, and **agentic AI-powered** orchestration system to:
+- 📊 Provide **real-time exception tracking**
+- 💬 Enable **chat-based insights** for operations analysts
+- ⚙️ Automate post-trade functions with **goal-driven agents**
+- ☁️ Use **event-driven AWS services** for seamless scalability
 
-### Team Information
+---
 
+## 🧠 Team & Approach
 
-## Using DCO to sign your commits
+**Team Name**: AutoKaarargal  
+**Room**: 3  
+**Use Case Theme**: Agentic AI Workflow  
+**Category**: Academic  
 
-**All commits** must be signed with a DCO signature to avoid being flagged by the DCO Bot. This means that your commit log message must contain a line that looks like the following one, with your actual name and email address:
+### 👥 Team Members (Full Names)
+- **Jeff Reuben S I**  
+- **Anton Gilchrist A**  
+- **Sumithra S**  
+- **Jabin Joseph M**  
+- **Jayasurya R**  
+- **Pugazhvendhan S**  
+- **Peggy Priscilla Marie J**  
+- **Joe Anidas E**  
+- **Suruthi S**  
+- **Namitta Evangelin**
 
-```
-Signed-off-by: John Doe <john.doe@example.com>
-```
+---
 
-Adding the `-s` flag to your `git commit` will add that line automatically. You can also add it manually as part of your commit log message or add it afterwards with `git commit --amend -s`.
+### 🧩 Our Approach
 
-See [CONTRIBUTING.md](./.github/CONTRIBUTING.md) for more information
+| Component               | Description                                                                 |
+|-------------------------|-----------------------------------------------------------------------------|
+| **Agentic Architecture** | Modular Lambda agents for Matching, Reconciliation, and Settlement workflows |
+| **Exception Handler**   | Central log aggregator with structured, personalized exception reports     |
+| **Chatbot Interface**   | AI assistant accesses agent memory to answer exception-related queries      |
+| **Event-Driven Design** | AWS Lambda + Step Functions for low-latency, scalable orchestration         |
 
-### Helpful DCO Resources
-- [Git Tools - Signing Your Work](https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work)
-- [Signing commits
-](https://docs.github.com/en/github/authenticating-to-github/signing-commits)
+---
 
+## 🛠️ Tech Stack
 
-## License
+| Layer               | Technologies                                                                 |
+|---------------------|------------------------------------------------------------------------------|
+| **Frontend**        | Next.js 14, Tailwind CSS, Chatbot UI                                         |
+| **Backend**         | AWS Lambda, Step Functions, Node.js                                          |
+| **Exception Memory**| Aurora DB (MySQL) with structured exception tables                           |
+| **AI Interface**    | LangChain-powered chatbot (NLP for Exception Insight)                        |
+| **Notifications**   | Email, Slack/Teams Webhook Integration                                       |
 
-Copyright 2025 FINOS
+---
 
-Distributed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+## ✅ Sponsor Technologies Used
 
-SPDX-License-Identifier: [Apache-2.0](https://spdx.org/licenses/Apache-2.0)
+- **AWS**:  
+  - Lambda  
+  - Step Functions  
+  - S3  
+  - Aurora (MySQL)
 
+- **LangChain** *(Planned)*:  
+  - For chatbot memory grounding
 
+- **Slack / Teams Webhooks**:  
+  - Real-time reporting to trade ops channels
 
+---
 
+## ✨ Key Features
 
+- ✅ Modular Lambda Agents: Match, Reconcile, Settle  
+- ✅ Central Exception Handler: Aggregates structured logs  
+- ✅ Chatbot Insight Engine: Human-like querying of trade exceptions  
+- ✅ Cross-Platform Reporting: Email, Teams, S3 Storage  
+- ✅ Fully Serverless: AWS-native, scalable event orchestration  
+- ✅ Exception Memory Tables: Long-term record of agent behavior
 
+---
 
+## 📅 Hackathon Timeline
 
+- **June 6** – Invitations Released  
+- **June 9** – Hackathon Begins  
+- **June 9–11** – Use Case Development & Collaboration  
+- **June 12** – Team Presentations  
+- **June 16** – Winners Announced  
+
+> 💡 *Commit Early, Commit Often – DCO Signed Commits Required!*
+
+---
+
+## 🔏 Developer Certificate of Origin (DCO)
+
+To sign a commit with DCO:
+
+```bash
+git commit -s -m "your message"
