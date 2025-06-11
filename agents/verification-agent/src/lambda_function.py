@@ -1,7 +1,7 @@
 import json
 import boto3
 import pymysql
-from datetime import datetime
+from datetime import datetime, date
 import os
 from decimal import Decimal
 
@@ -28,9 +28,9 @@ def validate_trade(trade, rules, reference_prices, holidays, instruments):
         errors.append("Invalid instrument")
 
     # 2. Broker checks
-    if trade["broker_id"] in rules["approved_brokers"]:
+    if trade["broker_id"].upper() not in rules["approved_brokers"]:
         errors.append("Invalid broker_id")
-    if trade["contra_broker_id"] in rules["approved_contra_brokers"]:
+    if trade["contra_broker_id"].upper() not in rules["approved_contra_brokers"]:
         errors.append("Invalid contra_broker_id")
 
     # 3. Price validation
@@ -50,16 +50,23 @@ def validate_trade(trade, rules, reference_prices, holidays, instruments):
     if trade["order_type"] not in rules["valid_order_types"]:
         errors.append("Invalid order_type")
 
-    # 5. Holiday check
-    trade_date = trade["date"].strftime('%Y-%m-%d')
+    # 5. Holiday check — FIXED
+    if isinstance(trade["date"], (datetime, date)):
+        trade_date = trade["date"].strftime('%Y-%m-%d')
+    else:
+        trade_date = str(trade["date"])
+
     if trade_date in holidays:
         errors.append("Trade date falls on a holiday")
 
     return "UMAT" if not errors else "ERR1", errors
 
 def lambda_handler(event, context):
+    conn = None
+    cursor = None
+
     try:
-        # Load rule and reference data
+        # Load rule and reference data from S3
         rules = load_json_from_s3('rules.json')
         holidays = rules.get("holidays", [])
         reference_prices = rules.get("price_validation", {}).get("reference_prices", {})
@@ -127,4 +134,4 @@ def lambda_handler(event, context):
         if cursor:
             cursor.close()
         if conn:
-            conn.close() 
+            conn.close()

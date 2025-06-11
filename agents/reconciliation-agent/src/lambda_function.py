@@ -34,6 +34,7 @@ def lambda_handler(event, context):
         matched_trades = cursor.fetchall()
 
         reconciled = 0
+        skipped = 0
         timestamp = datetime.utcnow()
 
         for trade in matched_trades:
@@ -72,13 +73,22 @@ def lambda_handler(event, context):
                     break
 
             if exact_match:
-                # Step 4: Update both tables to RCND
+                # Step 4: Update both tables to RCND and log success
                 cursor.execute("UPDATE trades_data SET status='RCND' WHERE trade_id=%s", (trade_id,))
                 cursor.execute("UPDATE dtcc_data SET status='RCND' WHERE trade_id=%s", (trade_id,))
+                cursor.execute("""
+                    INSERT INTO trade_log (trade_id, status, errors, check_timestamp)
+                    VALUES (%s, %s, %s, %s)
+                """, (
+                    trade_id,
+                    "RCND",
+                    json.dumps([]),
+                    timestamp
+                ))
                 reconciled += 1
                 continue
 
-            # Step 5: Check if mismatch is only in order_type and other fields match
+            # Step 5: Check if mismatch is only in order_type
             partial_match_found = False
             for dtcc in dtcc_trades:
                 match = True
@@ -93,7 +103,18 @@ def lambda_handler(event, context):
                     break
 
             if partial_match_found:
-                continue  # skip logging error due to acceptable order_type variation
+                # Log as SKIP (order_type mismatch only)
+                cursor.execute("""
+                    INSERT INTO trade_log (trade_id, status, errors, check_timestamp)
+                    VALUES (%s, %s, %s, %s)
+                """, (
+                    trade_id,
+                    "SKIP",
+                    json.dumps(["Order type mismatch only, skipped reconciliation"]),
+                    timestamp
+                ))
+                skipped += 1
+                continue
 
             # Step 6: Log mismatch in trade_log with ERR3
             errors = []
@@ -120,7 +141,8 @@ def lambda_handler(event, context):
             "statusCode": 200,
             "body": json.dumps({
                 "reconciled_count": reconciled,
-                "mismatches_logged": len(matched_trades) - reconciled
+                "skipped_order_type_mismatch": skipped,
+                "mismatches_logged": len(matched_trades) - reconciled - skipped
             }),
             "headers": {
                 "Content-Type": "application/json"
