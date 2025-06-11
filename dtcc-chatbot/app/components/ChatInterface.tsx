@@ -116,13 +116,15 @@ export default function ChatInterface({
             }`}>
               {m.role === 'user' ? 'You' : 'DTCC Assistant'}
             </div>
-            {m.role === 'assistant' ? (
-              <ReactMarkdown className="prose prose-invert max-w-none text-gray-200">
-                {m.content}
-              </ReactMarkdown>
-            ) : (
-              <p className="text-gray-200">{m.content}</p>
-            )}
+            
+            {/* Fixed: Wrap ReactMarkdown in a div for styling */}
+            <div className="prose prose-invert max-w-none text-gray-200">
+              {m.role === 'assistant' ? (
+                <ReactMarkdown>{m.content}</ReactMarkdown>
+              ) : (
+                <p>{m.content}</p>
+              )}
+            </div>
           </div>
         ))}
         
