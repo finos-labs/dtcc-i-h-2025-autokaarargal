@@ -1,0 +1,102 @@
+# This AWS SAM template has been generated from your function's configuration. If
+# your function has one or more triggers, note that the AWS resources associated
+# with these triggers aren't fully specified in this template and include
+# placeholder values. Open this template in AWS Infrastructure Composer or your
+# favorite IDE and modify it to specify a serverless application with other AWS
+# resources.
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: An AWS Serverless Application Model template describing your function.
+Resources:
+  settlementagent:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./src
+      Description: ''
+      MemorySize: 128
+      Timeout: 20
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.13
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
+      Environment:
+        Variables:
+          DB_HOST: trades-market.cluster-cdya8kk4eoa1.us-west-2.rds.amazonaws.com
+          DB_NAME: trades_market
+          DB_PASSWORD: DTCC2025
+          DB_PORT: '3306'
+          DB_USER: admin
+          SETTLEMENT_BUCKET: settlement-bucket-result
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 21600
+        MaximumRetryAttempts: 2
+      Layers:
+        - !Ref Layer1
+      PackageType: Zip
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - s3:PutObject
+                - s3:GetObject
+                - s3:ListBucket
+              Resource:
+                - arn:aws:s3:::settlement-bucket-result
+                - arn:aws:s3:::settlement-bucket-result/*
+            - Effect: Allow
+              Action:
+                - ec2:CreateNetworkInterface
+                - ec2:DescribeNetworkInterfaces
+                - ec2:DeleteNetworkInterface
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - s3:Get*
+                - s3:List*
+                - s3:Describe*
+                - s3-object-lambda:Get*
+                - s3-object-lambda:List*
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - s3:*
+                - s3-object-lambda:*
+              Resource: '*'
+      RecursiveLoop: Terminate
+      SnapStart:
+        ApplyOn: None
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-069cccb8731151e86
+          - sg-02dd9595635a1703c
+        SubnetIds:
+          - subnet-07e4d2eb377bff256
+          - subnet-0745a404ffb2cd55a
+        Ipv6AllowedForDualStack: false
+      Events:
+        Api1:
+          Type: Api
+          Properties:
+            Path: /settlement-agent
+            Method: ANY
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
+  # This resource represents your Layer with name pymysql1-layer. To download
+# the content of your Layer, go to
+# 
+# aws.amazon.com/go/view?arn=arn%3Aaws%3Alambda%3Aus-west-2%3A608553547594%3Alayer%3Apymysql1-layer%3A1&source=lambda
+  Layer1:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: ./pymysql1-layer
+      LayerName: pymysql1-layer
+      CompatibleRuntimes:
+        - python3.13

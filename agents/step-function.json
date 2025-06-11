@@ -1,82 +1,130 @@
 {
-    "Comment": "A description of my state machine",
-    "StartAt": "Verification-Agent",
-    "States": {
-      "Verification-Agent": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::lambda:invoke",
-        "Output": "{% $states.result.Payload %}",
-        "Arguments": {
-          "FunctionName": "arn:aws:lambda:us-west-2:608553547594:function:verification-agent:$LATEST",
-          "Payload": "{% $states.input %}"
-        },
-        "Retry": [
-          {
-            "ErrorEquals": [
-              "Lambda.ServiceException",
-              "Lambda.AWSLambdaException",
-              "Lambda.SdkClientException",
-              "Lambda.TooManyRequestsException"
-            ],
-            "IntervalSeconds": 1,
-            "MaxAttempts": 3,
-            "BackoffRate": 2,
-            "JitterStrategy": "FULL"
-          }
-        ],
-        "Next": "Trade-Matching-Agent",
-        "TimeoutSeconds": 60
+  "Comment": "A description of my state machine",
+  "StartAt": "Verification-Agent",
+  "States": {
+    "Verification-Agent": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Output": "{% $states.result.Payload %}",
+      "Arguments": {
+        "FunctionName": "arn:aws:lambda:us-west-2:608553547594:function:verification-agent:$LATEST",
+        "Payload": "{% $states.input %}"
       },
-      "Trade-Matching-Agent": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::lambda:invoke",
-        "Output": "{% $states.result.Payload %}",
-        "Arguments": {
-          "FunctionName": "arn:aws:lambda:us-west-2:608553547594:function:trade-matching-agent:$LATEST",
-          "Payload": "{% $states.input %}"
-        },
-        "Retry": [
-          {
-            "ErrorEquals": [
-              "Lambda.ServiceException",
-              "Lambda.AWSLambdaException",
-              "Lambda.SdkClientException",
-              "Lambda.TooManyRequestsException"
-            ],
-            "IntervalSeconds": 1,
-            "MaxAttempts": 3,
-            "BackoffRate": 2,
-            "JitterStrategy": "FULL"
-          }
-        ],
-        "Next": "Reconciliation-Agent",
-        "TimeoutSeconds": 60
-      },
-      "Reconciliation-Agent": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::lambda:invoke",
-        "Output": "{% $states.result.Payload %}",
-        "Arguments": {
-          "FunctionName": "arn:aws:lambda:us-west-2:608553547594:function:reconciliation-agent:$LATEST",
-          "Payload": "{% $states.input %}"
-        },
-        "Retry": [
-          {
-            "ErrorEquals": [
-              "Lambda.ServiceException",
-              "Lambda.AWSLambdaException",
-              "Lambda.SdkClientException",
-              "Lambda.TooManyRequestsException"
-            ],
-            "IntervalSeconds": 1,
-            "MaxAttempts": 3,
-            "BackoffRate": 2,
-            "JitterStrategy": "FULL"
-          }
-        ],
-        "End": true,
-        "TimeoutSeconds": 60
-      }
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Next": "Trade-Matching-Agent",
+      "TimeoutSeconds": 60
     },
-    "QueryLanguage": "JSONata"
-  }
+    "Trade-Matching-Agent": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Output": "{% $states.result.Payload %}",
+      "Arguments": {
+        "FunctionName": "arn:aws:lambda:us-west-2:608553547594:function:trade-matching-agent:$LATEST",
+        "Payload": "{% $states.input %}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Next": "Reconciliation-Agent",
+      "TimeoutSeconds": 60
+    },
+    "Reconciliation-Agent": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Output": "{% $states.result.Payload %}",
+      "Arguments": {
+        "FunctionName": "arn:aws:lambda:us-west-2:608553547594:function:reconciliation-agent:$LATEST",
+        "Payload": "{% $states.input %}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "TimeoutSeconds": 60,
+      "Next": "Settlement-Agent"
+    },
+    "Settlement-Agent": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Output": "{% $states.result.Payload %}",
+      "Arguments": {
+        "FunctionName": "arn:aws:lambda:us-west-2:608553547594:function:settlement-agent:$LATEST",
+        "Payload": "{% $states.input %}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "Next": "Exception-Mailer-Agent"
+    },
+    "Exception-Mailer-Agent": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Output": "{% $states.result.Payload %}",
+      "Arguments": {
+        "FunctionName": "arn:aws:lambda:us-west-2:608553547594:function:exception-mailer-agent:$LATEST",
+        "Payload": "{% $states.input %}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2,
+          "JitterStrategy": "FULL"
+        }
+      ],
+      "End": true
+    }
+  },
+  "QueryLanguage": "JSONata"
+}
