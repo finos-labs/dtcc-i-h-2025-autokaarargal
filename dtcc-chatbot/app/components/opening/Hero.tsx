@@ -1,9 +1,7 @@
 'use client';
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Features from "./Features";
+
 
 
 export default function Hero() {
@@ -44,20 +42,20 @@ export default function Hero() {
             <div className="relative h-full min-h-[300px] md:min-h-[400px] lg:min-h-[500px] md:-ml-8 lg:-ml-12">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-3xl" />
               <div className="relative h-full w-full overflow-hidden rounded-3xl shadow-2xl">
-                <Image
-                  src="/images/cover4.jpg"
-                  alt="Post Trade Processing"
-                  fill
-                  className="object-cover"
-                  priority
-                  quality={85}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
-                />
+              <Image
+                src="/images/cover.jpg"
+                alt="Post Trade Processing"
+                fill
+                className="object-cover object-center" // Added object-center
+                priority
+                quality={85}
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
+              />
               </div>
             </div>
           </div>
         </div>
-        <Features />
+  
       </section>
     </>
   );
