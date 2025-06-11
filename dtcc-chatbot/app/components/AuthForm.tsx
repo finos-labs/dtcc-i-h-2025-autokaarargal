@@ -150,30 +150,38 @@ export default function AuthForm({
   };
 
   return (
-    <div className="w-full min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-gray-100">
-      <div className="flex-grow flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 flex flex-col gap-6">
+    <div className="relative min-h-screen w-full flex flex-col bg-slate-900 overflow-x-hidden">
+      {/* Grid pattern background */}
+      <div className="absolute inset-0 opacity-10 [background-image:linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] [background-size:24px_24px]"></div>
+      
+      <div className="relative z-10 flex-grow flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md bg-gray-900/70 backdrop-blur-md rounded-2xl border border-gray-800 p-8 flex flex-col gap-6 shadow-xl">
           <div className="text-center mb-2">
-            <h1 className="text-2xl font-bold text-blue-900 mb-1">
-              {isLogin ? 'Login to DTCC Portal' : 'Sign Up for DTCC Portal'}
+            <div className="inline-flex items-center px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-full mb-4">
+              <span className="text-sm font-medium text-blue-400">
+                DTCC Portal
+              </span>
+            </div>
+            <h1 className="text-3xl font-bold text-white mb-2">
+              {isLogin ? 'Login to Dashboard' : 'Create Account'}
             </h1>
-            <p className="text-gray-600 text-sm">
+            <p className="text-gray-400">
               {isLogin
-                ? 'Enter your credentials to access the DTCC Post-Trade Processing Platform.'
-                : 'Create your internal account to access DTCC post-trade tools.'}
+                ? 'Access your post-trade processing dashboard' 
+                : 'Get started with DTCC trade management'}
             </p>
           </div>
           
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
-              <label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-gray-400 text-sm font-medium mb-2">
                 Email
               </label>
               <input
                 id="email"
                 type="email"
                 placeholder="your@email.com"
-                className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -182,14 +190,14 @@ export default function AuthForm({
             </div>
             
             <div className="flex flex-col gap-1">
-              <label htmlFor="password" className="text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-gray-400 text-sm font-medium mb-2">
                 Password
               </label>
               <input
                 id="password"
                 type="password"
                 placeholder="••••••••"
-                className="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -199,26 +207,26 @@ export default function AuthForm({
             
             <button
               type="submit"
-              className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md"
+              className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 transition-colors disabled:opacity-50 shadow-md"
             >
               {isLogin ? 'Login' : 'Create Account'}
             </button>
             
             {error && (
-              <div className="text-red-600 text-sm bg-red-50 border border-red-200 rounded p-2 text-center">
+              <div className="text-red-400 text-sm bg-red-900/20 border border-red-800 rounded-lg p-3 text-center">
                 {error}
               </div>
             )}
           </form>
           
           <div className="flex items-center gap-2 my-2">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-gray-400 text-xs">OR</span>
-            <div className="flex-1 h-px bg-gray-200" />
+            <div className="flex-1 h-px bg-gray-700" />
+            <span className="text-gray-500 text-xs">OR</span>
+            <div className="flex-1 h-px bg-gray-700" />
           </div>
           
           <button
-            className="w-full py-3 flex items-center justify-center gap-2 bg-white border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
+            className="w-full py-3 flex items-center justify-center gap-2 bg-gray-800 border border-gray-700 rounded-lg font-medium text-gray-200 hover:bg-gray-700 transition-colors"
             onClick={handleGoogleSignIn}
             type="button"
           >
@@ -234,13 +242,13 @@ export default function AuthForm({
             Continue with Google
           </button>
           
-          <div className="text-center text-gray-600 mt-2 text-sm">
+          <div className="text-center text-gray-500 mt-2 text-sm">
             {isLogin ? (
               <span>
                 Don&apos;t have an account?{' '}
                 <button
                   type="button"
-                  className="text-blue-600 font-medium hover:text-blue-800"
+                  className="text-blue-400 font-medium hover:text-blue-300 transition-colors"
                   onClick={() => router.push('/signup')}
                 >
                   Sign Up
@@ -251,7 +259,7 @@ export default function AuthForm({
                 Already have an account?{' '}
                 <button
                   type="button"
-                  className="text-blue-600 font-medium hover:text-blue-800"
+                  className="text-blue-400 font-medium hover:text-blue-300 transition-colors"
                   onClick={() => router.push('/login')}
                 >
                   Login
